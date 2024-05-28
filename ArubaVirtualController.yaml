@@ -195,8 +195,8 @@ zabbix_export:
                   value: 'Access Points'
               trigger_prototypes:
                 - uuid: e06160454aa74b7694de51d8b971c9dc
-                  expression: 'max(/Aruba Virtual Controller by SNMP/aiAPStatus.[{#APNAME}],5m)=0'
-                  name: 'AP Status - {#APNAME}'
+                  expression: 'max(/Aruba Virtual Controller by SNMP/aiAPStatus.[{#APNAME}],5m)>1'
+                  name: 'AP is down for more than 5 Minutes- {#APNAME}'
                   priority: WARNING
                   manual_close: 'YES'
             - uuid: fe10c010fe9b42be902c2845f2af2dac
