@@ -31,6 +31,6 @@ AP Up Time- {#APNAME}| uptime|Dependent Item|aiAPUptime.[{#APNAME}]
 ## Triggers
 Name|Description|Expression|Priority
 --|--|--|--
-AP is down for more than 5 Minutes- {#APNAME}|Status is higer than 1 for 5 Minutes|avg(/Aruba Virtual Controller by SNMP/aiAPStatus.[{#APNAME}],5m)>1|Warning
+AP is down for more than 5 Minutes- {#APNAME}|Status is higer than 1 for 5 Minutes|avg(/Aruba Virtual Controller by SNMP/aiAPStatus.[{#APNAME}],5m)=2|Warning
 ## References
 https://github.com/dvirsolomon/zabbix provided a similar template. I took this one and changed a few things.
