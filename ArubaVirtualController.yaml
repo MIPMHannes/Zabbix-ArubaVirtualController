@@ -1,0 +1,260 @@
+zabbix_export:
+  version: '6.4'
+  template_groups:
+    - uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    - uuid: 86f7a90ed67243b8a68587193010839b
+      template: 'Aruba Virtual Controller by SNMP'
+      name: 'Aruba Virtual Controller by SNMP'
+      description: |
+        This Templates monitors Aruba Virtual Controller.
+        It is heavily inspired by https://github.com/dvirsolomon/zabbix
+      groups:
+        - name: 'Templates/Network devices'
+      items:
+        - uuid: 7a7b668bec87446ea921118d01af25bd
+          name: 'Virtual Controller IP'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.14823.2.3.3.1.1.5.0
+          key: aiVirtualControllerIPAddress.0
+          delay: 10m
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OOB_IP
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: Application
+              value: 'System Information'
+        - uuid: 94d44f0d06e246b58267dfa1ee6efe31
+          name: 'Virtual Controller Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.14823.2.3.3.1.1.2.0
+          key: aiVirtualControllerName.0
+          delay: 10m
+          trends: '0'
+          value_type: TEXT
+          description: 'Virtual Controller Name'
+          inventory_link: NAME
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: Application
+              value: 'System Information'
+        - uuid: a51a0a1000d5438cb6423f39c63f5e7c
+          name: 'Virtual Controller Software Version'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.14823.2.3.3.1.1.4.0
+          key: aiVirtualControllerVersion.0
+          delay: 10m
+          trends: '0'
+          value_type: TEXT
+          inventory_link: SOFTWARE
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: Application
+              value: 'System Information'
+        - uuid: 6554b93483c84ddcb0a5df5b46b19f7a
+          name: 'Get AP data'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[.1.3.6.1.4.1.14823.2.3.3.1.2.1]'
+          key: aruba.get.APData
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+      discovery_rules:
+        - uuid: 789237398c0c4130a5351213d78a1f8a
+          name: 'Discover APs'
+          type: DEPENDENT
+          key: aruba.discover.AP
+          delay: '0'
+          description: 'Discover APs'
+          item_prototypes:
+            - uuid: c0be52fdce2144b483f1d4bf40d03bcc
+              name: 'AP CPU UTILIZATION - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPCPUUtilization.[{#APNAME}]'
+              delay: '0'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 042b7e2790cf4ed1ab5c3dc7aeabffe9
+              name: 'AP IP ADDRESS - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPIPAddress.[{#APNAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.3.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 8b6082c63b05473a86660e70b025a664
+              name: 'AP MAC ADDRESS - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPMACAddress.[{#APNAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.1.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: abd083b796284b52b241a6b95c4cfd93
+              name: 'AP MEMORY FREE - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPMemoryFree.[{#APNAME}]'
+              delay: '0'
+              units: B
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 037ef6f6b9ab4964b8f1545ccbe9e63c
+              name: 'AP MODEL NAME- {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPModelName.[{#APNAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.6.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: f497a33bcbda44e8b79f530a0679c964
+              name: 'AP SERIAL NUMBER- {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPSerialNum.[{#APNAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.4.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 423883a490d94188a30c66ea940870e5
+              name: 'AP Status - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPStatus.[{#APNAME}]'
+              delay: '0'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.11.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+              trigger_prototypes:
+                - uuid: e06160454aa74b7694de51d8b971c9dc
+                  expression: 'max(/Aruba Virtual Controller by SNMP/aiAPStatus.[{#APNAME}],5m)=0'
+                  name: 'AP Status - {#APNAME}'
+                  priority: WARNING
+                  manual_close: 'YES'
+            - uuid: fe10c010fe9b42be902c2845f2af2dac
+              name: 'AP MEMORY TOTAL - {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPTotalMemory.[{#APNAME}]'
+              delay: '0'
+              units: B
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.10.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 8cd2d30ed11d407a979b8e99bfbbd4d0
+              name: 'AP Up Time- {#APNAME}'
+              type: DEPENDENT
+              key: 'aiAPUptime.[{#APNAME}]'
+              delay: '0'
+              value_type: FLOAT
+              units: uptime
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.9.{#SNMPINDEX}'
+                    - '0'
+                - type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+              master_item:
+                key: aruba.get.APData
+              tags:
+                - tag: application
+                  value: 'Access Points'
+            - uuid: 6727e5eca24a423bb3328f2505e278c2
+              name: 'AP MEMORY USED - {#APNAME}'
+              type: CALCULATED
+              key: 'iAPUsedMemory.[{#APNAME}]'
+              units: B
+              params: 'last(//aiAPTotalMemory.[{#APNAME}])-last(//aiAPMemoryFree.[{#APNAME}])'
+              tags:
+                - tag: application
+                  value: 'Access Points'
+          master_item:
+            key: aruba.get.APData
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#APNAME}'
+                - 1.3.6.1.4.1.14823.2.3.3.1.2.1.1.2
+                - '0'
+                - '{#APIP}'
+                - .1.3.6.1.4.1.14823.2.3.3.1.2.1.1.3
+                - '0'
